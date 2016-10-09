@@ -419,7 +419,7 @@ class BlogMain(UserHandler):
                     e.put()
 
 
-        self.render("blog.html", posts = entries, username = username)
+        self.render("blog.html", posts = entries, username = username, user_id = user_id)
 
 class NewPost(UserHandler):
     """Handler for creating new posts.
@@ -579,7 +579,7 @@ class EditPost(UserHandler):
 
         else:
             error = "Sorry you cannot edit others posts"
-            self.render("editpost.html", subject = subject, content = content, username = username, error = error)
+            self.render("editpost.html", post_id = post_id, subject = subject, content = content, username = username, error = error)
 
 class EditComments(UserHandler):
     """The Handler edits a comment.

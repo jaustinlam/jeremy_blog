@@ -27,7 +27,7 @@
                 {% if username: %}
                     {% if p.liked == True: %}
                         <p>You liked this post!</p>
-                    {% elif p.liked == None: %}
+                    {% elif user_id == p.author: %}
                         <p>This is your post</p>
                     {% else: %}
                         <p>You haven't liked this post</p>
