@@ -1,0 +1,40 @@
+<!-- The main blog page -->
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% block content %}
+    <div class="row">
+        <div class="col-xs-6">
+            <h1 id="post-head">All Posts</h1>
+        </div>
+        <div class="col-xs-6">
+            {% if username: %}
+                <a class="btn btn-info" href="/newpost">New Post</a>
+            {% else: %}
+                <a class="btn btn-info" href="/login">New Post</a>
+            {% endif %}
+        </div>
+
+        {% for p in posts: %}
+            <div class="col-xs-12">
+                <a href="/{{p.key().id()}}">
+                <h3>{{p.subject}}</h3></a>
+            </div>
+            <div class="col-xs-8">
+                <p>on: {{p.created.strftime("%b %d, %Y")}}
+                <h4 id="post-content">{{p.content}}</h4>
+            </div>
+            <div class="col-xs-12">
+                {% if username: %}
+                    {% if p.liked == True: %}
+                        <p>You liked this post!</p>
+                    {% elif p.liked == None: %}
+                        <p>This is your post</p>
+                    {% else: %}
+                        <p>You haven't liked this post</p>
+                    {% endif %}
+                {% endif %}
+           </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

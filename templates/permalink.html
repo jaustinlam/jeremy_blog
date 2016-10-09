@@ -1,0 +1,75 @@
+<!-- The individual post page -->
+<!DOCTYPE html>
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row" id="post">
+    <div class="col-xs-6">
+        <h1>{{post.subject}}</h1>
+        <p>wrote on:{{post.created.strftime("%b %d, %Y")}}</p>
+        <hr>
+    </div>
+    <div class="col-xs-6">
+        {% if username: %}
+            <a href="/edit/{{post.key().id()}}" class="btn btn-info btn-sm">Edit</a>
+        {% else: %}
+            <a href="/" class="btn btn-info btn-sm">Edit</a>
+        {% endif %}
+        <a href="/blog" class="btn btn-info btn-sm">All Posts</a>
+    </div>
+    <div class="col-xs-8">
+        <h4>{{post.content}}</h4>
+    </div>
+    <div class="col-xs-6">
+        {% if username: %}
+            {% if liked == True: %}
+                <a class="btn btn-success" href="/unlike/{{post.key().id()}}">Liked</a>
+            {% else: %}
+                <a class="btn btn-danger" href="/like/{{post.key().id()}}">Not Liked</a>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+<div class="row" id="comments">
+        {% if username: %}
+            <div class="col-xs-12">
+                <b><p>Add a new comment</b></p>
+            </div>
+            <form method="post">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <label>Comment</label>
+                        <input name="com_content" type="text" class="form-control">
+                    </div>
+                </div>
+
+                {% if error: %}
+                    <div class="col-xs-12">
+                        <div class="alert alert-danger" role="alert">
+                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                            <span class="sr-only">Error:</span>
+                            {{error}}
+                        </div>
+                    </div>
+                {% endif %}
+                    <div class="col-xs-12">
+                        <button class="btn btn-info" type="submit">Submit</button>
+                {% endif %}
+                    </div>
+            </form>
+
+    <div class="col-xs-6">
+        <h4> Comments </h4>
+    </div>
+        {% if post_comments: %}
+            {% for c in post_comments: %}
+                <div class="col-xs-12">
+                    <p>on: {{c.created.strftime("%b %d, %Y")}}</p>
+                    <a href="/editcomment/{{c.key().id()}}"><p>{{c.com_content}}</p></a>
+                    <br>
+                </div>
+            {% endfor %}
+        {% endif %}
+</div>
+
+{% endblock %}

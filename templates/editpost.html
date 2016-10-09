@@ -1,0 +1,43 @@
+<!-- Edit a post -->
+<!DOCTYPE html>
+
+
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-6">
+        <h1>Edit Post.</h1>
+    </div>
+    <div class="col-xs-6">
+        <a class="btn btn-info" href="/{{"%s" % post_id}}">
+            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true">
+                </span>Back to Post</a>
+
+    </div>
+    <hr>
+    <div class="col-xs-12">
+        <form method="post">
+            <div class="form-group">
+                <label>Subject</label>
+                <input name="subject" type="text" class="form-control" placeholder="Enter a subject." value="{{subject}}">
+            </div>
+            <div class="form-group">
+                <label>Content</label>
+                <textarea name="content" class="form-control" rows="5">{{content}}</textarea>
+            </div>
+            {% if error: %}
+                <div class="alert alert-danger" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    <span class="sr-only">Error:</span>
+                {{error}}
+                </div>
+            {% endif %}
+            <button class="btn btn-info" type="submit"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> Save</button>
+            <a class="btn btn-danger" href="/delete/{{"%s" % post_id}}">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true">
+            </span> Delete Post</a>
+        </form>
+    </div>
+
+{% endblock %}

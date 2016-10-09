@@ -1,0 +1,39 @@
+<!-- Edit a comment -->
+<!DOCTYPE html>
+
+
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-xs-6">
+        <h1>Edit Comment.</h1>
+    </div>
+    <div class="col-xs-6">
+        <a class="btn btn-info" href="/{{"%s" % post_id}}">
+            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true">
+                </span>Back to Post</a>
+
+    </div>
+    <hr>
+    <div class="col-xs-12">
+        <form method="post">
+            <div class="form-group">
+                <label>Comment</label>
+                <input name="com_content" type="text" class="form-control" placeholder="Enter a comment." value="{{com_content}}">
+            </div>
+            {% if error: %}
+                <div class="alert alert-danger" role="alert">
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    <span class="sr-only">Error:</span>
+                {{error}}
+                </div>
+            {% endif %}
+            <button class="btn btn-info" type="submit"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> Save</button>
+            <a class="btn btn-danger" href="/deletecomment/{{"%s" % comment_id}}">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true">
+            </span> Delete Comment</a>
+        </form>
+    </div>
+
+{% endblock %}

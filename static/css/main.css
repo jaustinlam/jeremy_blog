@@ -1,0 +1,83 @@
+/* Core Elements */
+
+body{
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+
+}
+
+hr{
+    border-color: #a9a9a9;
+}
+
+
+
+/* Classes */
+.navbar{
+    background-color: #78b6db;
+    font-family: 'Amatic SC', cursive;
+    color: white;
+    margin-bottom: 0;
+}
+
+.btn-info{
+    background-color: #e7efcd;
+    color: #808080;
+    border-color: #808080;
+    margin-top: 10px;
+}
+
+.btn-danger{
+    margin-top: 10px;
+}
+
+/* ID's */
+
+#main-container{
+    background-color: #F1F1F1;
+    height: 100%;
+}
+
+#login-box, #signup-box{
+    background-color: #78b6db;
+    text-align: center;
+    margin-top: 10vh;
+    margin-bottom: 33vh;
+    margin-left: 33vw;
+    margin-right: 33vw;
+    padding-bottom: 20px;
+    border-style: double;
+    border-width: 5px;
+    border-color: #808080;
+    height: 400px;
+
+}
+
+#signup-box{
+    height: 500px;
+}
+
+#welcome-head, #post-head{
+    font-family: 'Amatic SC', cursive;
+    margin-top: 40px;
+    color: white;
+}
+
+#post-head{
+    color: #808080;
+}
+
+#comments{
+    background-color: white;
+}
+
+#post{
+    height: 80vh;
+}
+
+#post-content{
+    color: #a9a9a9;
+}
+
+
+
