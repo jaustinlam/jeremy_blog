@@ -6,23 +6,27 @@ import hmac
 import hashlib
 import string
 import random
-import secret_ky #secret used for hashed password.
+import secret_ky  # secret used for hashed password.
 
 from google.appengine.ext import db
 
-#### JINJA SETUP ####
+# JINJA SETUP #
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
-jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), autoescape= True)
+jinja_env = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(template_dir), autoescape=True)
 """set up of Jinja templates"""
 
-#### DATABASES ####
+# DATABASES #
 
-def blog_key(name = 'default'):
+
+def blog_key(name='default'):
     return db.Key.from_path('blogs', name)
     """The Parent blog key."""
 
+
 class Posts(db.Model):
+
     """ Database for Post Entries
 
     This Database stores and holds all Posts that were created.
@@ -37,16 +41,16 @@ class Posts(db.Model):
 
     """
 
-    subject = db.StringProperty(required = True)
-    content = db.TextProperty(required = True)
-    created = db.DateTimeProperty(auto_now_add = True)
-    last_modified = db.DateTimeProperty(auto_now_add = True)
+    subject = db.StringProperty(required=True)
+    content = db.TextProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+    last_modified = db.DateTimeProperty(auto_now_add=True)
     author = db.StringProperty()
-    liked = db.BooleanProperty() #for liked posts
-
+    liked = db.BooleanProperty()  # for liked posts
 
 
 class Comments(db.Model):
+
     """ Database for Comments
 
     This Database stores all comments made on posts.
@@ -59,14 +63,14 @@ class Comments(db.Model):
 
     """
 
-
-    com_content = db.TextProperty(required = True)
-    author = db.StringProperty(required = True)
-    post_id = db.StringProperty(required = True)
-    created = db.DateTimeProperty(auto_now_add = True)
+    com_content = db.TextProperty(required=True)
+    author = db.StringProperty(required=True)
+    post_id = db.StringProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
 
 
 class Likes(db.Model):
+
     """ Database for Likes on posts
 
     This Database stores any likes that were made on a post.
@@ -77,12 +81,14 @@ class Likes(db.Model):
 
     """
 
+    user = db.StringProperty(required=True)
+    post_id = db.StringProperty(required=True)
 
-    user = db.StringProperty(required = True)
-    post_id = db.StringProperty(required = True)
+# The User database to store our user credentials.##
 
-##The User database to store our user credentials.##
+
 class User(db.Model):
+
     """ Database for Users
 
     This Database stores all created users.
@@ -93,11 +99,9 @@ class User(db.Model):
 
     """
 
-
-    user = db.StringProperty(required = True)
-    password = db.StringProperty(required = True)
-    email = db.StringProperty(required = False)
-
+    user = db.StringProperty(required=True)
+    password = db.StringProperty(required=True)
+    email = db.StringProperty(required=False)
 
     @classmethod
     def get_name(cls, name):
@@ -111,9 +115,9 @@ class User(db.Model):
 
         """
 
-        current_user = db.GqlQuery("SELECT * FROM User WHERE user=:1", name).get()
+        current_user = db.GqlQuery(
+            "SELECT * FROM User WHERE user=:1", name).get()
         return current_user
-
 
     @classmethod
     def by_id(cls, uid):
@@ -130,24 +134,24 @@ class User(db.Model):
         user = User.get_by_id(uid)
         return user.user
 
-
     @classmethod
-    def register(cls, name, pw, email = None):
-        """Take the user credentials entered, creates a hashed password and prepares to register User.
+    def register(cls, name, pw, email=None):
+        """Take the user credentials entered, hashes password,
+            prepares to register user.
 
             Args:
                 name: the user name.
                 password: the user entered password.
-                email: the user entered email, it is optional and defaults to None if not entered.
+                email: the user entered email, it is optional.
 
             Returns:
-                An entry prepared to pass the inputted information into User database.
+                An entry prepared to pass the inputted
+                information into User database.
 
         """
 
         pw_hash = create_hash_pw(name, pw)
-        return User(user = name, password = pw_hash, email = email)
-
+        return User(user=name, password=pw_hash, email=email)
 
     @classmethod
     def login(cls, name, pw):
@@ -168,9 +172,9 @@ class User(db.Model):
             print "login-failed"
 
 
-#### USER SIGNUP ####
+# USER SIGNUP #
 
-def make_salt(length = 5):
+def make_salt(length=5):
     """Creates salt to be used in user password.
 
         Args:
@@ -184,17 +188,20 @@ def make_salt(length = 5):
     s = ''.join(random.choice(string.letters) for x in xrange(length))
     return str(s)
 
-def create_hash_pw(name, pw, salt = None):
+
+def create_hash_pw(name, pw, salt=None):
     """Create a hashed password to pass in to database.
 
         Args:
             name: the entered user name.
             pw: the user entered password.
-            salt: either the salt created in the make_salt function or an entered salt.
+            salt: either the salt created in the
+            make_salt function or an entered salt.
 
 
         Returns:
-            A hashed password split by a '|'. The front end is the salt for the password.
+            A hashed password split by a '|'.
+            The front end is the salt for the password.
 
     """
 
@@ -224,6 +231,8 @@ def valid_pw(name, pw, h):
 
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
+
+
 def valid_username(username):
     """Checks if username entered is a valid format.
 
@@ -238,6 +247,8 @@ def valid_username(username):
     return username and USER_RE.match(username)
 
 PASS_RE = re.compile(r"^.{3,20}$")
+
+
 def valid_password(password):
     """Checks if password entered is a valid format.
 
@@ -251,7 +262,9 @@ def valid_password(password):
 
     return password and PASS_RE.match(password)
 
-EMAIL_RE  = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
+EMAIL_RE = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
+
+
 def valid_email(email):
     """Checks if email entered is a valid format.
 
@@ -266,15 +279,15 @@ def valid_email(email):
     return not email or EMAIL_RE.match(email)
 
 
-#### HANDLERS ####
+# HANDLERS #
 
 class Handler(webapp2.RequestHandler):
+
     """ Handler for rendering pages
 
     All other Handlers inherit the methods in here.
 
     """
-
 
     def write(self, *a, **kw):
         self.response.out.write(*a, **kw)
@@ -286,16 +299,17 @@ class Handler(webapp2.RequestHandler):
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
 
-## The User Handler that adds to the base handler and adds cookies. ##
-## All other Handlers will inherits the methods in here. ##
+# The User Handler that adds to the base handler and adds cookies.
+# All other Handlers will inherits the methods in here.
+
+
 class UserHandler(Handler):
+
     """ Handler for rendering pages, inherits from Handler.
 
     Adds to Handler class and adds cookie methods.
 
     """
-
-
 
     def create_secure_val(self, value):
         """Creates the hashed string to send to user_id cookie.
@@ -310,7 +324,6 @@ class UserHandler(Handler):
 
         hashu = hashlib.sha256(value + secret_ky.secret).hexdigest()
         return "%s|%s" % (value, hashu)
-
 
     def check_secure_val(self, value):
         """Checks the string pulled from the cookie and splits off the user_id.
@@ -341,7 +354,9 @@ class UserHandler(Handler):
         """
 
         user_id_cookie = self.create_secure_val(uid)
-        return self.response.headers.add_header('Set-Cookie', 'user_id=%s; PATH=/' %str(user_id_cookie))
+        return self.response.headers.add_header('Set-Cookie',
+                                                'user_id=%s; PATH=/'
+                                                % str(user_id_cookie))
 
     def read_secure_cookie(self):
         """Pulls the user_id cookie and validates if it is valid.
@@ -374,21 +389,23 @@ class UserHandler(Handler):
 
 
 class Landing(UserHandler):
+
     """Main landing page Handler.
 
         """
 
-
     def get(self):
         self.render("front.html")
 
-##########BLOG HANDLERS############
+# BLOG HANDLERS
 
-##  ##
+
 class BlogMain(UserHandler):
+
     """The Main Blog Page that displays the 10 most recent Blog entries.
 
     """
+
     def get(self):
         """Sets the Main Blog Page.
 
@@ -401,9 +418,11 @@ class BlogMain(UserHandler):
             username = User.by_id(int(user_id))
         else:
             username = None
-        entries = db.GqlQuery("SELECT * FROM Posts ORDER BY created DESC LIMIT 10")
+        entries = db.GqlQuery(
+            "SELECT * FROM Posts ORDER BY created DESC LIMIT 10")
         liked = db.GqlQuery("SELECT * FROM Likes")
-        # checks if any entries are either the current users post, they liked the post or didn't like it.#
+        # checks if any entries are either the current users post, they liked
+        # the post or didn't like it.#
         for e in entries:
             for l in liked:
                 if l.user == e.author:
@@ -418,14 +437,15 @@ class BlogMain(UserHandler):
                     e.liked = False
                     e.put()
 
+        self.render(
+            "blog.html", posts=entries, username=username, user_id=user_id)
 
-        self.render("blog.html", posts = entries, username = username, user_id = user_id)
 
 class NewPost(UserHandler):
+
     """Handler for creating new posts.
 
     """
-
 
     def get(self):
         """Sets New Post page.
@@ -433,7 +453,6 @@ class NewPost(UserHandler):
         Returns:
             renders newpost.html for the page.
         """
-
 
         self.render("newpost.html")
 
@@ -446,22 +465,30 @@ class NewPost(UserHandler):
         subject = self.request.get("subject")
         content = self.request.get("content")
         author = str(self.read_secure_cookie())
+        print author
 
-        #Creates a new post if there is a subject and content or it will re-render the page with an error. #
-        if subject and content:
-            current_post = Posts(parent = blog_key(), subject = subject, content = content, author = author)
+        if author == "None":  # Checks if there is a user.
+            self.redirect("/")
+
+        # Checks to see if there is a user and subject.
+        elif subject and content:
+            current_post = Posts(
+                parent=blog_key(), subject=subject,
+                content=content, author=author)
             current_post.put()
             self.redirect("/%s" % str(current_post.key().id()))
 
         else:
             error = "Please enter a subject and content!"
-            self.render("newpost.html", subject = subject, content = content, error = error)
+            self.render(
+                "newpost.html", subject=subject, content=content, error=error)
+
 
 class Post(UserHandler):
+
     """The Handler to display an individual post.
 
     """
-
 
     def get_comments(self, blog_key):
         """Finds all comments on a particular post.
@@ -473,9 +500,10 @@ class Post(UserHandler):
             all comments that match the post
         """
 
-        post_comments = db.GqlQuery("SELECT * FROM Comments WHERE post_id=:1", str(blog_key.key().id()))
+        post_comments = db.GqlQuery(
+            "SELECT * FROM Comments WHERE post_id=:1",
+            str(blog_key.key().id()))
         return post_comments
-
 
     def get(self, post_id):
         """Sets Individual Post page.
@@ -484,22 +512,28 @@ class Post(UserHandler):
             renders permalink.html for the page.
         """
 
-        key = db.Key.from_path("Posts", int(post_id), parent = blog_key())
+        key = db.Key.from_path("Posts", int(post_id), parent=blog_key())
         post = db.get(key)
-        post_comments = self.get_comments(post) #Retrieves comments on the post#
+        # Retrieves comments on the post#
+        post_comments = self.get_comments(post)
         user_id = self.read_secure_cookie()
         if user_id:
             username = User.by_id(int(user_id))
         else:
             username = None
-        isliked = db.GqlQuery("SELECT * FROM Likes WHERE user=:1 AND post_id=:2",str(user_id), str(post_id)).get()
+        isliked = db.GqlQuery(
+            "SELECT * FROM Likes WHERE user=:1 AND post_id=:2",
+            str(user_id), str(post_id)).get()
 
-        if isliked: # Checking against likes to see if current user has liked post. #
+        # Checking against likes to see if current user has liked post. #
+        if isliked:
             liked = True
         else:
             liked = False
 
-        self.render("permalink.html", post = post, post_comments = post_comments, username = username, liked = liked)
+        self.render("permalink.html", post=post,
+                    post_comments=post_comments,
+                    username=username, liked=liked)
 
     def post(self, post_id):
         """Posts comments on the New Post page.
@@ -508,11 +542,12 @@ class Post(UserHandler):
                 post_id: The id of the post.
 
             Returns:
-                if without errors it enter the comment in to Comment database. If with error it re renderts the page with an error.
+                if without errors it enter the comment in to Comment database.
+                If with error it re renderts the page with an error.
         """
         com_content = self.request.get("com_content")
         author = str(self.read_secure_cookie())
-        key = db.Key.from_path("Posts", int(post_id), parent = blog_key())
+        key = db.Key.from_path("Posts", int(post_id), parent=blog_key())
         post = db.get(key)
         post_id = str(post.key().id())
 
@@ -520,19 +555,30 @@ class Post(UserHandler):
         user_id = int(self.read_secure_cookie())
         username = User.by_id(user_id)
 
+        if not user_id:  # Checking for a user
+            error = "Sorry only logged in users can post comments"
+            self.render("permalink.html", post=post,
+                        post_comments=post_comments,
+                        username=username, error=error)
 
-        if com_content: # Checks to see if user has entered a comment and will post to Comment database if not blank. #
-            current_comment = Comments(com_content = com_content, author = author, post_id = post_id)
+        elif com_content:  # Checks to see if comment has content.
+            current_comment = Comments(
+                com_content=com_content, author=author, post_id=post_id)
             current_comment.put()
             self.redirect("/%s" % post_id)
         else:
             error = "Sorry the comment can not be blank"
-            self.render("permalink.html", post = post, post_comments = post_comments, username = username, error = error)
+            self.render("permalink.html", post=post,
+                        post_comments=post_comments,
+                        username=username, error=error)
+
 
 class EditPost(UserHandler):
+
     """The Handler for editing a post and possibly save the edited post.
 
     """
+
     def get(self, post_id):
         """Sets Edit Post page.
 
@@ -542,7 +588,7 @@ class EditPost(UserHandler):
             Returns:
                 renders editpost.html for the page.
         """
-        key = db.Key.from_path("Posts", int(post_id), parent = blog_key())
+        key = db.Key.from_path("Posts", int(post_id), parent=blog_key())
         post = db.get(key)
         post_id = post.key().id()
         subject = post.subject
@@ -550,7 +596,8 @@ class EditPost(UserHandler):
         user_id = int(self.read_secure_cookie())
         username = User.by_id(user_id)
 
-        self.render("editpost.html", subject = subject, content = content, username = username, post_id = str(post_id))
+        self.render("editpost.html", subject=subject,
+                    content=content, username=username, post_id=str(post_id))
 
     def post(self, post_id):
         """Sets Edit Post page.
@@ -559,9 +606,10 @@ class EditPost(UserHandler):
                 post_id: the id of the post.
 
             Returns:
-                if without error saves changes to the post entry. If with error re renders editpost with an error.
+                if without error saves changes to the post entry.
+                If with error re renders editpost with an error.
         """
-        key = db.Key.from_path("Posts", int(post_id), parent = blog_key())
+        key = db.Key.from_path("Posts", int(post_id), parent=blog_key())
         current_post = db.get(key)
         post_id = current_post.key().id()
         author = current_post.author
@@ -570,8 +618,9 @@ class EditPost(UserHandler):
         user_id = int(self.read_secure_cookie())
         username = User.by_id(user_id)
 
-
-        if current_post.author == str(user_id):# Saves edits that you made on the post or returns an error if you are not the author. #
+        # Saves edits that you made on the post or returns an error if you are
+        # not the author. #
+        if current_post.author == str(user_id):
             current_post.subject = subject
             current_post.content = content
             current_post.put()
@@ -579,12 +628,16 @@ class EditPost(UserHandler):
 
         else:
             error = "Sorry you cannot edit others posts"
-            self.render("editpost.html", post_id = post_id, subject = subject, content = content, username = username, error = error)
+            self.render("editpost.html", post_id=post_id, subject=subject,
+                        content=content, username=username, error=error)
+
 
 class EditComments(UserHandler):
+
     """The Handler edits a comment.
 
     """
+
     def get(self, comment_id):
         """Sets Edit Comment page.
 
@@ -602,7 +655,9 @@ class EditComments(UserHandler):
         username = User.by_id(user_id)
         comment_id = current_comment.key().id()
 
-        self.render("editcomment.html", comment_id = comment_id, com_content = com_content, post_id = post_id, username = username)
+        self.render("editcomment.html", comment_id=comment_id,
+                    com_content=com_content,
+                    post_id=post_id, username=username)
 
     def post(self, comment_id):
         """Posts Edit Comment page.
@@ -611,7 +666,9 @@ class EditComments(UserHandler):
                 comment_id: the id of the comment.
 
             Returns:
-                if without error will update comment entry and redirect back to post. If with error will re redirect back to the post with and error message.
+                if without error will update comment entry
+                and direct back to post.
+                If with error will direct back to the post with and error.
         """
         key = db.Key.from_path("Comments", int(comment_id))
         current_comment = db.get(key)
@@ -621,20 +678,27 @@ class EditComments(UserHandler):
         username = User.by_id(user_id)
         comment_id = current_comment.key().id()
 
-        if not com_content: # Check to see if comment is now blank.
+        if not com_content:  # Check to see if comment is now blank.
             error = "Comment cannot be blank."
-            self.render("editcomment.html", comment_id = comment_id, com_content = com_content, post_id = post_id, username = username, error = error)
+            self.render("editcomment.html", comment_id=comment_id,
+                        com_content=com_content, post_id=post_id,
+                        username=username, error=error)
 
-        elif str(user_id) == current_comment.author: # Must be author of comment.
-            current_comment.com_content = com_content # New comment content.
-            current_comment.put() # saving comment.
+        # Must be author of comment.
+        elif str(user_id) == current_comment.author:
+            current_comment.com_content = com_content  # New comment content.
+            current_comment.put()  # saving comment.
             self.redirect("/%s" % str(post_id))
 
         else:
             error = "Sorry you cannot edit others comments."
-            self.render("editcomment.html", comment_id = comment_id, com_content = com_content, post_id = post_id, username = username, error = error)
+            self.render("editcomment.html", comment_id=comment_id,
+                        com_content=com_content, post_id=post_id,
+                        username=username, error=error)
+
 
 class DeleteComments(UserHandler):
+
     """This Handler will delete a comment.
     """
 
@@ -645,7 +709,8 @@ class DeleteComments(UserHandler):
                 comment_id: the id of the comment.
 
             Returns:
-                If without error will delete entry and return to post page. If with error will re render post page with error message.
+                If without error will delete entry and return to post page.
+                If with error will re render post page with error message.
         """
         key = db.Key.from_path("Comments", int(comment_id))
         current_comment = db.get(key)
@@ -655,20 +720,24 @@ class DeleteComments(UserHandler):
         username = User.by_id(user_id)
         post_id = current_comment.post_id
 
-        if current_comment.author == str(user_id): # Must be author of the comment.
-            db.delete(current_comment) # delete the comment entry.
+        # Must be author of the comment.
+        if current_comment.author == str(user_id):
+            db.delete(current_comment)  # delete the comment entry.
             self.redirect("/%s" % str(post_id))
 
         else:
             error = "Sorry you cannot delete others comments"
-            self.render("editcomment.html", comment_id = comment_id, com_content = com_content, post_id = post_id, username = username, error = error)
-
+            self.render("editcomment.html", comment_id=comment_id,
+                        com_content=com_content, post_id=post_id,
+                        username=username, error=error)
 
 
 class DeletePost(UserHandler):
+
     """The Handler that will delete a post from the database.
 
     """
+
     def get(self, post_id):
         """Deletes the post
 
@@ -676,9 +745,10 @@ class DeletePost(UserHandler):
                 post_id: the id of the post.
 
             Returns:
-                if without error sends user back to the main blog page. If with error re renders editpost page with an error.
+                if without error sends user back to the main blog page.
+                If with error re renders editpost page with an error.
         """
-        key = db.Key.from_path("Posts", int(post_id), parent = blog_key())
+        key = db.Key.from_path("Posts", int(post_id), parent=blog_key())
         current_post = db.get(key)
         user_id = int(self.read_secure_cookie())
         username = User.by_id(user_id)
@@ -688,12 +758,18 @@ class DeletePost(UserHandler):
             self.redirect("/blog")
         else:
             error = "Sorry you cannot delete others posts"
-            self.render("editpost.html", post_id = post_id, subject = current_post.subject, content = current_post.content, username = username, error = error)
+            self.render("editpost.html", post_id=post_id,
+                        subject=current_post.subject,
+                        content=current_post.content,
+                        username=username, error=error)
+
 
 class LikePost(UserHandler):
-    """The Handler that will like a post and enter a like into Like database.
+
+    """The Handler that will like a post and a like into Like database.
 
     """
+
     def get(self, post_id):
         """Likes the post
 
@@ -701,27 +777,36 @@ class LikePost(UserHandler):
                 post_id: the id of the post.
 
             Returns:
-                if without error sends user back to the post. If with error re renders editpost page with an error.
+                if without error sends user back to the post.
+                If with error re renders editpost page with an error.
         """
-        key = db.Key.from_path("Posts", int(post_id), parent = blog_key())
+        key = db.Key.from_path("Posts", int(post_id), parent=blog_key())
         current_post = db.get(key)
         post_id = current_post.key().id()
         user_id = int(self.read_secure_cookie())
         username = User.by_id(user_id)
 
-        if current_post.author != str(user_id): #If you are not the author you can like the post and new entry on Like database is made. #
-            like_post = Likes(user= str(user_id), post_id= str(post_id))
+        # If you are not the author you can like the post and new entry on Like
+        # database is made. #
+        if current_post.author != str(user_id):
+            like_post = Likes(user=str(user_id), post_id=str(post_id))
             like_post.put()
             self.redirect("/%s" % post_id)
         else:
-            error = "Sorry you cannot like your own post. However you can edit it."#Sends you to Edit page#
-            self.render("editpost.html", post_id = post_id, subject = current_post.subject, content = current_post.content, username = username, error = error)
+            # Sends you to Edit page#
+            error = "Sorry you cannot like your own post."
+            self.render("editpost.html", post_id=post_id,
+                        subject=current_post.subject,
+                        content=current_post.content,
+                        username=username, error=error)
 
 
 class UnlikePost(UserHandler):
+
     """The handler to unlike a particular post.
 
     """
+
     def get(self, post_id):
         """Unlikes the post
 
@@ -729,28 +814,35 @@ class UnlikePost(UserHandler):
                 post_id: the id of the post.
 
             Returns:
-                if without error sends user back to the post. If with error re renders editpost page with an error.
+                if without error sends user back to the post.
+                If with error re renders editpost page with an error.
         """
-        key = db.Key.from_path("Posts", int(post_id), parent = blog_key())
+        key = db.Key.from_path("Posts", int(post_id), parent=blog_key())
         current_post = db.get(key)
         post_id = current_post.key().id()
         user_id = int(self.read_secure_cookie())
         username = User.by_id(user_id)
-        liked_post = db.GqlQuery("SELECT * FROM Likes WHERE user=:1 and post_id=:2", str(user_id), str(post_id)).get()
+        liked_post = db.GqlQuery(
+            "SELECT * FROM Likes WHERE user=:1 and post_id=:2",
+            str(user_id), str(post_id)).get()
 
         if current_post != str(user_id):
-            db.delete(liked_post) #Removes the liked entry from the database. #
+            # Removes the liked entry from the database. #
+            db.delete(liked_post)
             self.redirect("/%s" % post_id)
         else:
-            error = "Sorry you cannot unlike your own post. However you can edit it."
-            self.render("editpost.html", subject = current_post.subject, content = current_post.content, username = username, error = error)
+            error = "Sorry you cannot unlike your own post."
+            self.render("editpost.html", subject=current_post.subject,
+                        content=current_post.content,
+                        username=username, error=error)
 
-##########USER HANDLERS############
+# USER HANDLERS
+
 
 class SignUp(UserHandler):
+
     """The Sign Up Page Handler that allows a user to sign up
     """
-
 
     def get(self):
         """Gets the Signup page
@@ -764,7 +856,8 @@ class SignUp(UserHandler):
         """Posts to the Signup database
 
             Returns:
-                If without error signs up the user and renders welcome page and sets the cookie. If with error re renders page with an error message.
+                If without error signs up the user and sets the cookie.
+                If with error re renders page with an error message.
         """
         have_error = False
         username = self.request.get('username')
@@ -772,14 +865,15 @@ class SignUp(UserHandler):
         verify = self.request.get('verify')
         email = self.request.get('email')
 
-        params = dict(username = username,
-                      email = email)
+        params = dict(username=username,
+                      email=email)
         # Error checking
         if not valid_username(username):
             params['error'] = "That's not a valid username."
             have_error = True
         else:
-            dup_user = db.GqlQuery("SELECT * FROM User WHERE user=:1", username).get()
+            dup_user = db.GqlQuery(
+                "SELECT * FROM User WHERE user=:1", username).get()
             if dup_user:
                 params['error'] = "That username already exists."
                 have_error = True
@@ -795,20 +889,22 @@ class SignUp(UserHandler):
             params['error'] = "That's not a valid email."
             have_error = True
 
-        #Generate pages
+        # Generate pages
         if have_error:
             self.render('signup.html', **params)
         else:
-            current_user = User.register(name = username, pw = password, email = email)
-            current_user.put() #Enters new user in to User database.
-            self.login_user(current_user) #sets the user_id cookie.
+            current_user = User.register(
+                name=username, pw=password, email=email)
+            current_user.put()  # Enters new user in to User database.
+            self.login_user(current_user)  # sets the user_id cookie.
 
             self.redirect('/welcome')
 
+
 class Welcome(UserHandler):
+
     """The Welcome Page Handler that acknowledges sucessfully sign up or login.
     """
-
 
     def get(self):
         """Gets the Welcome page
@@ -820,12 +916,13 @@ class Welcome(UserHandler):
         user_id = int(self.read_secure_cookie())
         username = User.by_id(user_id)
 
-        self.render("welcome.html", username = username)
+        self.render("welcome.html", username=username)
+
 
 class Login(UserHandler):
+
     """The Login Page Handler that allows existing users to sign in.
     """
-
 
     def get(self):
         """Gets the Login page.
@@ -845,18 +942,20 @@ class Login(UserHandler):
                 password: Entered password
 
             Returns:
-                if without error sets user_id cookie and directs to welcome page. If with error re renders page with error message.
+                if without error sets user_id cookie
+                and directs to welcome page.
+                If with error re renders page with error message.
 
         """
 
-        current_user = User.login(name = name, pw = password)
+        current_user = User.login(name=name, pw=password)
         if current_user:
             self.login_user(current_user)
             self.redirect('/welcome')
 
         else:
             error_msg = "Sorry, something didn't match, try again."
-            self.render("login.html", name = name, error = error_msg)
+            self.render("login.html", name=name, error=error_msg)
 
     def post(self):
         """Logs in user
@@ -873,9 +972,9 @@ class Login(UserHandler):
 
 
 class Logout(UserHandler):
+
     """The Logout Handler that logs the user out and clears the cookie.
     """
-
 
     def get(self):
         """Logs out user
